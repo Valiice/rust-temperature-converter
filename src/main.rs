@@ -42,17 +42,9 @@ fn get_conversion_type() -> char {
 
     let conversion: char = match conversion.trim().to_lowercase().parse() {
         Ok(num) => num,
-        Err(error) => panic!("Problem converting the conversion letter: {}", error),
+        Err(error) => panic!("Problem converting the conversion: {}", error),
     };
     conversion
-}
-
-fn input_str() -> String {
-    let mut input = String::new();
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Failed to read line");
-    input
 }
 
 fn get_number_input() -> i64 {
@@ -62,5 +54,13 @@ fn get_number_input() -> i64 {
         Ok(num) => num,
         Err(error) => panic!("Problem converting the input: {}", error),
     };
+    input
+}
+
+fn input_str() -> String {
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read line");
     input
 }
