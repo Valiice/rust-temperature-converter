@@ -1,38 +1,73 @@
-use std::{io, thread, time::Duration};
+use std::{
+    fs::File,
+    io::{self, Write},
+    thread,
+    time::{Duration, Instant},
+};
 
 fn main() {
     let conversion = get_conversion_type();
 
     let input = get_number_input();
-    let converted: f64 = convert(conversion, input);
 
-    clearscreen::clear().expect("failed to clear screen");
+    let mut file = File::create("output-borrow.txt").expect("Could not create file!");
+    let mut vec_times: Vec<Duration> = Vec::new();
 
-    match conversion {
-        'c' => println!("Fahrenheit: {input}°F to Celsius: {converted:.2}°C"),
-        'f' => println!("Celsius: {input}°C to Fahrenheit: {converted:.2}°F"),
-        _ => panic!("Problem printing result"),
+    for _ in 0..1000 {
+        let now = Instant::now();
+
+        let converted: f64 = convert(&conversion, &input);
+
+        clearscreen::clear().expect("failed to clear screen");
+
+        match conversion {
+            'c' => println!("Fahrenheit: {input}°F to Celsius: {converted:.2}°C"),
+            'f' => println!("Celsius: {input}°C to Fahrenheit: {converted:.2}°F"),
+            _ => panic!("Problem printing result"),
+        }
+
+        let elapsed = now.elapsed();
+        vec_times.push(elapsed);
+        // println!("Elapsed: {:.2?}", elapsed);
+    }
+
+    // let now = Instant::now();
+
+    // let converted: f64 = convert(&conversion, &input);
+
+    // clearscreen::clear().expect("failed to clear screen");
+
+    // match conversion {
+    //     'c' => println!("Fahrenheit: {input}°F to Celsius: {converted:.2}°C"),
+    //     'f' => println!("Celsius: {input}°C to Fahrenheit: {converted:.2}°F"),
+    //     _ => panic!("Problem printing result"),
+    // }
+
+    // let elapsed = now.elapsed();
+    // println!("Elapsed: {:.2?}", elapsed);
+    for time in vec_times {
+        writeln!(&mut file, "{:.2?}", time).expect("Cannot write to file, sorry.");
     }
     thread::sleep(Duration::from_secs(5));
 }
 
-fn convert(conversion: char, input: i64) -> f64 {
+fn convert(conversion: &char, input: &i64) -> f64 {
     let mut converted: f64 = 0.0;
-    let input = input as f64;
+    let input = *input as f64;
 
     match conversion {
-        'c' => converted = to_celsius(input),
-        'f' => converted = to_fahrenheit(input),
+        'c' => converted = to_celsius(&input),
+        'f' => converted = to_fahrenheit(&input),
         _ => println!("Not a valid conversion type"),
     }
     converted
 }
 
-fn to_celsius(input: f64) -> f64 {
+fn to_celsius(input: &f64) -> f64 {
     (input - 32.0) * 5.0 / 9.0
 }
 
-fn to_fahrenheit(input: f64) -> f64 {
+fn to_fahrenheit(input: &f64) -> f64 {
     (input * 9.0 / 5.0) + 32.0
 }
 
